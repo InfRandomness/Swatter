@@ -1,0 +1,32 @@
+name: Swift CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: swift-actions/setup-swift@v1
+        if: matrix.os != 'windows-latest'
+
+      - name: Install Swift (Windows)
+        uses: compnerd/gha-setup-swift@main
+        if: matrix.os == 'windows-latest'
+        with:
+          branch: swift-5.5-release
+          tag: 5.5-RELEASE
+
+      - name: Build ${{ matrix.os }}
+        run: swift build -v
+
+      - name: Tests ${{ matrix.os }}
+        run: swift test -v
