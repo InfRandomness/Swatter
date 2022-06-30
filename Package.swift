@@ -24,6 +24,7 @@ let package = Package(
       name: "SwatterTests",
       dependencies: [
         "Swatter"
-      ]),
+      ],
+      resources: [.copy("ProjectTests")]),
   ]
 )
