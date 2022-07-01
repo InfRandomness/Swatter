@@ -10,7 +10,7 @@ enum SwatterError: Error {
     switch self {
     case let .invalidDirectory(file):
       return "'\(file.relativePath)\' is not a valid directory"
-    case let .invalidPackageManifest:
+    case .invalidPackageManifest:
       return "Could not find a supported package manager manifest"
     }
   }
@@ -31,6 +31,7 @@ if let hasDirectoryPath = url?.hasDirectoryPath {
   }
 }
 
-if !Project.isValidProject(path: url!) {
+let project = Project(path: url!)
+if project == nil {
   throw SwatterError.invalidPackageManifest
 }

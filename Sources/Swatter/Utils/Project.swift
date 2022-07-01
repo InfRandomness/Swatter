@@ -10,7 +10,23 @@ enum PackageManagerManifest: String, CaseIterable {
   case carthage = "Cartfile"
 }
 
-enum Project {
+struct Project {
+  // Project's URL
+  var path: URL
+
+  /**
+   Initializes a project from an URL
+   - Parameter path: URL of the directory to initialize a Project for
+   - Returns: An instance of a Project object with the provided URL, or nil if the directory is invalid
+   */
+  init?(path: URL) {
+    if Project.isValidProject(path: path) {
+      self.path = path
+    } else {
+      return nil
+    }
+  }
+
   /**
    This function checks whether or not a URL to a directory contains a Swift project.
    The checking is done by verifying the existence of either (in order) :
