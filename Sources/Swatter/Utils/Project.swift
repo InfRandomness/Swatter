@@ -2,6 +2,7 @@ import Foundation
 
 enum ProjectError: Error {
   case unsupportedProject
+  case enumeratorError
 }
 
 enum PackageManagerManifest: String, CaseIterable {
@@ -45,5 +46,38 @@ struct Project {
       }
     }
     return false
+  }
+
+  /**
+   This functions iterates over files and directories to collect a list of .swift source files whilst
+   checking whether or not the path is in the exclusion list or contains .build
+   - Returns: The collected set of files
+   */
+  public func collectFiles(exclusions: Set<URL> = []) throws -> Set<URL> {
+    let fileManager = FileManager.default
+    guard
+      let enumerator = fileManager.enumerator(at: path, includingPropertiesForKeys: [], options: [])
+    else {
+      throw ProjectError.enumeratorError
+    }
+    var files = Set<URL>()
+    while let element = enumerator.nextObject() {
+      guard let file = element as? URL else {
+        continue
+      }
+
+      guard file.lastPathComponent != ".build", !exclusions.contains(path)
+      else {
+        enumerator.skipDescendants()
+        continue
+      }
+
+      guard file.pathExtension == "swift" else {
+        continue
+      }
+
+      files.insert(file)
+    }
+    return files
   }
 }
